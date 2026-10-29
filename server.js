@@ -21,17 +21,23 @@ function addLog(line) {
 }
 
 async function findUxPlay() {
+  const isWindows = process.platform === 'win32';
+  const executableName = isWindows ? 'uxplay.exe' : 'uxplay';
   const candidates = [
     process.env.UXPLAY_BIN,
+    ...(isWindows ? [join(homedir(), 'AppData', 'Local', 'Programs', 'UxPlay', executableName)] : []),
     join(homedir(), '.local', 'bin', 'uxplay'),
     '/usr/local/bin/uxplay',
     '/usr/bin/uxplay',
-    ...((process.env.PATH ?? '').split(':').map((directory) => join(directory, 'uxplay'))),
+    ...((process.env.PATH ?? '').split(isWindows ? ';' : ':').flatMap((directory) => [
+      join(directory, executableName),
+      ...(isWindows ? [join(directory, 'uxplay')] : []),
+    ])),
   ].filter(Boolean);
 
   for (const candidate of candidates) {
     try {
-      await access(candidate, constants.X_OK);
+      await access(candidate, isWindows ? constants.F_OK : constants.X_OK);
       return candidate;
     } catch {
       // Try the next known location.
@@ -139,7 +145,9 @@ const server = createServer(async (request, response) => {
       const args = ['-n', name, '-nh', '-p', '35000', '-fps', '60'];
       addLog('Starting UxPlay with automatic decoder and video output selection.');
       addLog('Requesting up to 60 FPS; audio/video synchronization is enabled.');
-      const child = spawn('stdbuf', ['-oL', '-eL', binary, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
+      const command = process.platform === 'win32' ? binary : 'stdbuf';
+      const commandArgs = process.platform === 'win32' ? args : ['-oL', '-eL', binary, ...args];
+      const child = spawn(command, commandArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
       receiver = Object.assign(child, { binary });
       addLog(`Process started: ${name} (${binary}).`);
       child.stdout.setEncoding('utf8').on('data', (text) => text.split(/\r?\n/).forEach(addLog));
