@@ -1,0 +1,43 @@
+{
+  "name": "penguinplay",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Receptor AirPlay de imagen y sonido para Linux",
+  "author": "JonayMr",
+  "desktopName": "penguinplay",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "desktop": "electron .",
+    "dist": "electron-builder --linux AppImage"
+  },
+  "build": {
+    "appId": "dev.penguinplay.desktop",
+    "productName": "PenguinPlay",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "public/**/*",
+      "server.js",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "AudioVideo",
+      "icon": "assets/penguinplay.png",
+      "syncDesktopName": true,
+      "synopsis": "Receptor AirPlay de imagen y sonido",
+      "description": "Duplica la pantalla y recibe audio desde dispositivos iOS en Linux.",
+      "artifactName": "PenguinPlay-${version}.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0"
+  }
+}

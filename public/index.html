@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f2f1e9">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'">
+    <title>PenguinPlay | Receptor AirPlay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="wordmark" href="/" aria-label="PenguinPlay, inicio">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>penguin<span class="wordmark-light">play</span></span>
+      </a>
+      <div class="topbar-meta"><span class="live-dot"></span><span>RECEPTOR LOCAL</span><span class="meta-divider"></span><span id="clock">--:--</span></div>
+    </header>
+
+    <main class="workspace">
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow"><span class="eyebrow-line"></span> AIRPLAY PARA LINUX <span class="eyebrow-index">01 / 01</span></div>
+        <h1 id="page-title">Tu pantalla,<br><span>en grande.</span></h1>
+        <p class="intro-copy">Recibe imagen y sonido de tu iPhone o iPad en esta pantalla.</p>
+      </section>
+
+      <section class="receiver-panel" aria-labelledby="receiver-heading">
+        <div class="panel-topline">
+          <div>
+            <p class="section-kicker">ESTACIÓN DE RECEPCIÓN</p>
+            <h2 id="receiver-heading">PenguinPlay</h2>
+          </div>
+          <div id="status-badge" class="status-badge" data-state="stopped"><span class="status-indicator"></span><span id="status-label">DETENIDO</span></div>
+        </div>
+
+        <div class="signal-visual" aria-hidden="true">
+          <div class="signal-orbit orbit-outer"></div>
+          <div class="signal-orbit orbit-inner"></div>
+          <div class="signal-core"><span class="screen-glyph"><i></i><i></i><i></i></span></div>
+          <div class="signal-wave wave-one"></div>
+          <div class="signal-wave wave-two"></div>
+          <div class="signal-wave wave-three"></div>
+          <span class="visual-label visual-label-left">VÍDEO</span>
+          <span class="visual-label visual-label-right">AUDIO</span>
+          <span class="visual-caption">LISTO PARA RECIBIR</span>
+        </div>
+
+        <form id="receiver-form" class="settings" autocomplete="off">
+          <label class="field-label" for="receiver-name">NOMBRE EN AIRPLAY</label>
+          <div class="name-control">
+            <input id="receiver-name" name="name" type="text" maxlength="40" value="PenguinPlay" required pattern="[\p{L}\p{N} _.\x2D]+" aria-describedby="name-help">
+            <span class="field-count"><span id="name-count">11</span><span> / 40</span></span>
+          </div>
+          <p id="name-help" class="field-hint">Así aparecerá en “Duplicar pantalla” en tu dispositivo.</p>
+
+          <div class="actions">
+            <button id="start-button" class="start-button" type="submit"><span class="button-icon" aria-hidden="true">▶</span><span>Iniciar receptor</span></button>
+            <button id="stop-button" class="stop-button" type="button" disabled aria-label="Detener receptor" title="Detener receptor"><span aria-hidden="true">■</span></button>
+          </div>
+          <p id="notice" class="notice" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="connection-row" aria-label="Estado de conexión">
+        <div class="connection-step"><span class="step-number">01</span><span class="step-label">RECEPTOR</span><span id="receiver-state" class="step-value">Apagado</span></div>
+        <span class="step-connector" aria-hidden="true"></span>
+        <div class="connection-step"><span class="step-number">02</span><span class="step-label">RED LOCAL</span><span class="step-value"><span class="network-dot"></span> Misma Wi-Fi</span></div>
+        <span class="step-connector" aria-hidden="true"></span>
+        <div class="connection-step"><span class="step-number">03</span><span class="step-label">DISPOSITIVO</span><span class="step-value">iPhone · iPad</span></div>
+      </section>
+
+      <details class="activity">
+        <summary><span class="activity-title"><span class="activity-led"></span> ACTIVIDAD DEL RECEPTOR</span><span id="log-count" class="log-count">0 EVENTOS</span></summary>
+        <div id="log-list" class="log-list"><p class="empty-log">Los mensajes de UxPlay aparecerán aquí.</p></div>
+      </details>
+    </main>
+
+    <footer class="footer"><span>PenguinPlay <span class="footer-separator">/</span> UxPlay</span><span>FUNCIONA EN ESTA RED LOCAL</span></footer>
+  </body>
+</html>
