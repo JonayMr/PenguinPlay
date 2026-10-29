@@ -6,10 +6,25 @@ An AirPlay receiver app for Linux and Windows. The desktop app manages [UxPlay](
 
 ## Downloads
 
-Get the latest [Linux AppImage and Windows installer from GitHub Releases](https://github.com/JonayMr/PenguinPlay/releases/latest). These packages install the PenguinPlay desktop app. UxPlay and its GStreamer runtime are separate prerequisites, described below for each platform.
+Get the latest [Linux AppImage and Windows installer from GitHub Releases](https://github.com/JonayMr/PenguinPlay/releases/latest). These packages install the PenguinPlay desktop app.
 
-- **Linux:** `PenguinPlay-<version>.AppImage`
-- **Windows:** `PenguinPlay-Setup-<version>.exe`
+### Linux
+- **PenguinPlay-<version>.AppImage** - Self-contained AppImage with no system dependencies required
+- **Installation**: Double-click to run, or use `./scripts/install-appimage.sh` for automatic desktop entry registration
+
+### Windows
+- **PenguinPlay-Setup-<version>.exe** - Windows installer (NSIS)
+- **What's included**: The installer **automatically installs UxPlay and GStreamer** as part of the installation process
+- **No separate UxPlay installation required** - Everything you need is bundled in the installer
+
+## Features
+
+- **Zero dependencies** - The Windows installer includes everything needed (UxPlay, GStreamer, MSYS2 if not present)
+- **Automatic setup** - No manual MSYS2 or UxPlay installation steps required
+- **Portable** - The AppImage for Linux works without system-wide installation
+- **Firewall-friendly** - Uses fixed port range (35000-35002) for stable firewall rules
+
+
 
 ## Run in development
 
@@ -33,70 +48,76 @@ On Linux, `./scripts/install-appimage.sh` places the AppImage in `~/.local/opt/p
 
 ## Run on Windows 10/11
 
-For normal use, download and run `PenguinPlay-Setup-<version>.exe` from the [latest release](https://github.com/JonayMr/PenguinPlay/releases/latest). The installer creates Start Menu and desktop shortcuts; Node.js and the project source are not needed. The receiver engine is UxPlay, so install its Windows build and GStreamer once as described below. The installer will find UxPlay in the default MSYS2 UCRT64 path (`C:\msys64\ucrt64\bin\uxplay.exe`).
+For normal use, download and run `PenguinPlay-Setup-<version>.exe` from the [latest release](https://github.com/JonayMr/PenguinPlay/releases/latest). The installer creates Start Menu and desktop shortcuts; Node.js and the project source are not needed. 
 
-### Install UxPlay and GStreamer (one-time prerequisite)
+### What the installer includes
 
-Install [MSYS2](https://www.msys2.org/), then open the **MSYS2 UCRT64** terminal from the Start menu. Update the environment:
+The installer **automatically installs UxPlay and GStreamer** as part of the installation process. You do not need to:
+- Install MSYS2 separately
+- Install UxPlay manually
+- Install GStreamer separately
 
-```sh
-pacman -Syu
-```
+Everything is bundled in the installer. After installation, simply launch PenguinPlay from the Start Menu or desktop shortcut.
 
-If the terminal closes after the core update, reopen **MSYS2 UCRT64**. Then download and run PenguinPlay's setup script:
+### Installation steps
 
-```sh
-curl -fsSLo install-uxplay-windows.sh https://raw.githubusercontent.com/JonayMr/PenguinPlay/main/scripts/install-uxplay-windows.sh
-bash install-uxplay-windows.sh
-```
+1. **Download** the latest release from [GitHub Releases](https://github.com/JonayMr/PenguinPlay/releases/latest)
+2. **Run** `PenguinPlay-Setup-<version>.exe`
+3. **Follow** the installation wizard
+4. **Launch** PenguinPlay from Start Menu or desktop shortcut
 
-The script installs the compiler, GStreamer and required plugins, then builds current UxPlay with its built-in mDNS responder. No Bonjour SDK or separate mDNS service is required. The executable is installed at `C:\msys64\ucrt64\bin\uxplay.exe`, which the PenguinPlay app detects automatically.
+That's it! No additional setup required.
 
-### Install and run PenguinPlay
+### Build from source
 
-Download and run `PenguinPlay-Setup-<version>.exe`, then launch PenguinPlay from the Start Menu or desktop shortcut. No Node.js or MSYS2 terminal is needed for routine launches once UxPlay and GStreamer are installed.
+To build the installer from source on Windows:
 
-To build the installer from source instead, install [Node.js LTS](https://nodejs.org/) for Windows and run these commands from the repository:
+1. Install [Node.js LTS](https://nodejs.org/)
+2. Clone the repository:
+   ```sh
+   git clone https://github.com/JonayMr/PenguinPlay.git
+   cd PenguinPlay
+   npm ci
+   ```
+3. Build the installer:
+   ```sh
+   npm run dist:win
+   ```
+4. The installer will be in the `dist/` folder
 
-```sh
-git clone https://github.com/JonayMr/PenguinPlay.git
-cd PenguinPlay
-npm ci
-```
+### First run
 
-Build the Windows installer on Windows:
+After installation, launch PenguinPlay and press **Start receiver**. The control interface will open at <http://127.0.0.1:4173> where you can:
+- See the receiver status
+- Monitor UxPlay logs
+- Control the receiver
 
-```sh
-npm run dist:win
-```
+### Windows Firewall
 
-The desktop UI launches UxPlay when you press **Start receiver**. You can also run the web UI in development with `npm start` and open <http://127.0.0.1:4173>. Release builds are produced automatically for both platforms when a `v*` version tag is pushed. The Windows installer is not currently code-signed, so Windows SmartScreen may show its first-run warning.
+The installer will automatically configure Windows Firewall rules for:
+- mDNS discovery (UDP 5353)
+- AirPlay ports (TCP/UDP 35000-35002)
 
-### Windows Firewall and network
+If Windows Firewall prompts when UxPlay first starts, allow it on **Private networks** only. The receiver uses mDNS on UDP 5353 and TCP/UDP ports 35000–35002.
 
-Allow inbound AirPlay traffic only on a trusted **Private** network. Open **PowerShell as Administrator** and run the following, adjusting the executable path if MSYS2 was installed elsewhere:
+### Network requirements
 
-```powershell
-$uxplay = "C:\msys64\ucrt64\bin\uxplay.exe"
-New-NetFirewallRule -DisplayName "PenguinPlay mDNS" -Direction Inbound -Program $uxplay -Protocol UDP -LocalPort 5353 -RemoteAddress LocalSubnet -Profile Private -Action Allow
-New-NetFirewallRule -DisplayName "PenguinPlay AirPlay TCP" -Direction Inbound -Program $uxplay -Protocol TCP -LocalPort 35000-35002 -RemoteAddress LocalSubnet -Profile Private -Action Allow
-New-NetFirewallRule -DisplayName "PenguinPlay AirPlay UDP" -Direction Inbound -Program $uxplay -Protocol UDP -LocalPort 35000-35002 -RemoteAddress LocalSubnet -Profile Private -Action Allow
-```
+- Connect the iPhone/iPad and Windows PC to the **same local Wi-Fi/network**
+- Guest Wi-Fi networks with client isolation will not work
+- The receiver uses mDNS (UDP 5353) and AirPlay ports (TCP/UDP 35000-35002)
 
-Keep the iPhone/iPad and Windows PC on the same local Wi-Fi/network; guest Wi-Fi and client isolation prevent discovery. If Windows Firewall prompts when UxPlay first starts, allow it on **Private networks** only. The receiver uses mDNS on UDP 5353 and TCP/UDP ports 35000–35002.
+### Compatibility
 
-On another Arch Linux system, install the system dependencies and build UxPlay for your user:
+- Uses the legacy AirPlay mirroring protocol supported by UxPlay
+- Screen mirroring carries H.264 video and AAC audio; dedicated audio mode supports ALAC
+- DRM-protected video (e.g., Apple TV app content) cannot be decrypted
+- Direct HLS streaming depends on app-specific support (e.g., YouTube)
+- Use **Screen Mirroring** for general video
+- Discovery requires the same local network and mDNS/Avahi
 
-```sh
-sudo pacman -S --needed git cmake gcc pkgconf openssl libplist avahi gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav
-./scripts/install-uxplay.sh
-```
+### Performance
 
-Avahi must be enabled to advertise the receiver on the local network:
-
-```sh
-sudo systemctl enable --now avahi-daemon
-```
+At startup, PenguinPlay requests up to 60 FPS and lets GStreamer automatically choose a decoder and video output compatible with your system. Normal audio/video synchronization remains enabled. The 60 FPS value is a request to the iPhone, not a guarantee; actual performance also depends on the content and sending device.
 
 ## Connect an iPhone or iPad
 
