@@ -1,18 +1,18 @@
 # PenguinPlay
 
-Receptor local de AirPlay para Linux. La app web administra [UxPlay](https://github.com/FDH2/UxPlay), que recibe duplicación de pantalla con imagen y sonido, además de audio AirPlay.
+A local AirPlay receiver for Linux. The desktop app manages [UxPlay](https://github.com/FDH2/UxPlay), which receives mirrored video with audio as well as AirPlay-only audio.
 
-## Ejecutar
+## Run in development
 
 ```sh
 npm start
 ```
 
-Abre <http://127.0.0.1:4173>. El modo de desarrollo usa Electron y electron-builder; el AppImage final no depende de una instalación global de Node. El receptor UxPlay está instalado en `~/.local/bin/uxplay` en el equipo de desarrollo.
+Open <http://127.0.0.1:4173>. Development uses Electron and electron-builder; the packaged AppImage does not require a system-wide Node.js installation. UxPlay is installed at `~/.local/bin/uxplay` on the development machine.
 
-## Aplicación de escritorio
+## Desktop application
 
-Requiere Node.js/npm, las dependencias multimedia y UxPlay instalados en el sistema.
+Build and install the AppImage:
 
 ```sh
 npm ci
@@ -20,29 +20,29 @@ npm run dist
 ./scripts/install-appimage.sh
 ```
 
-El instalador coloca el AppImage en `~/.local/opt/penguinplay`, registra la entrada de escritorio en `~/.local/share/applications` y copia el icono. Caelestia detecta esa entrada para su launcher Meta+Espacio. La ventana de escritorio inicia el servidor local automáticamente y detiene UxPlay al cerrarse.
+The installer places the AppImage in `~/.local/opt/penguinplay`, registers a desktop entry in `~/.local/share/applications`, and installs the icon. Caelestia indexes that entry in its Meta+Space launcher. The desktop window starts the local server automatically and stops UxPlay when it closes.
 
-En otro Arch Linux, instala las dependencias de sistema y compila UxPlay para tu usuario:
+On another Arch Linux system, install the system dependencies and build UxPlay for your user:
 
 ```sh
 sudo pacman -S --needed git cmake gcc pkgconf openssl libplist avahi gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-libav
 ./scripts/install-uxplay.sh
 ```
 
-Avahi debe estar habilitado para anunciar el receptor en la red local:
+Avahi must be enabled to advertise the receiver on the local network:
 
 ```sh
 sudo systemctl enable --now avahi-daemon
 ```
 
-## Conectar desde iPhone o iPad
+## Connect an iPhone or iPad
 
-1. Conecta el dispositivo iOS y el equipo Linux a la misma Wi-Fi; las redes de invitados con aislamiento entre clientes no sirven.
-2. Inicia el receptor y espera a que el iPhone se conecte.
-3. En iOS, abre el Centro de control, toca **Duplicar pantalla** y selecciona el nombre configurado.
-4. Para enviar solo audio, elige el receptor desde el selector AirPlay de una app compatible.
+1. Connect the iOS device and Linux host to the same Wi-Fi network. Guest networks with client isolation will not work.
+2. Start the receiver and wait for the iPhone to connect.
+3. On iOS, open Control Center, tap **Screen Mirroring**, and select the configured receiver name.
+4. To send audio only, select the receiver from the AirPlay picker in a compatible app.
 
-El cortafuegos debe permitir mDNS (UDP 5353) y los puertos AirPlay de UxPlay. PenguinPlay fija el bloque TCP/UDP `35000–35002` para que las reglas no cambien entre arranques; el servicio se anuncia por TCP `35001`. En este equipo la interfaz es `enp4s0`, la red IPv4 es `192.168.1.0/24` y el prefijo IPv6 local es `fdd0:7e7:91e0:401d::/64`. UFW tiene IPv6 habilitado, así que configura ambas familias:
+The firewall must allow mDNS (UDP 5353) and UxPlay's AirPlay ports. PenguinPlay fixes the TCP/UDP range `35000–35002` so firewall rules remain stable between launches; the service is advertised on TCP `35001`. On the development host, the interface is `enp4s0`, the IPv4 network is `192.168.1.0/24`, and the local IPv6 prefix is `fdd0:7e7:91e0:401d::/64`. UFW has IPv6 enabled, so configure both address families:
 
 ```sh
 sudo ufw allow in on enp4s0 from 192.168.1.0/24 to any port 5353 proto udp
@@ -54,18 +54,18 @@ sudo ufw allow in on enp4s0 from fdd0:7e7:91e0:401d::/64 to any port 35000:35002
 sudo ufw status numbered
 ```
 
-Si tu interfaz o subredes son distintas, sustitúyelas por las que muestran `ip -brief address` y `ip route`. Para confirmar que iPhone/iPad comparte la LAN, debe estar conectado a la misma Wi-Fi/router que este equipo (`192.168.1.x` o el prefijo IPv6 local); evita una Wi-Fi de invitados o el aislamiento de clientes. Si el nombre aparece en “Duplicar pantalla” pero iOS muestra “Unable to connect”, comprueba primero las reglas del cortafuegos.
+If your interface or subnet differs, replace these values with the ones shown by `ip -brief address` and `ip route`. To confirm that the iPhone/iPad is on the same LAN, it should be connected to the same Wi-Fi/router as this host (`192.168.1.x` or the local IPv6 prefix). Avoid guest Wi-Fi or client isolation. If the receiver appears in Screen Mirroring but iOS reports “Unable to connect,” check the firewall rules first.
 
-## Alcance
+## Compatibility
 
-- Usa el protocolo de duplicación AirPlay heredado compatible con UxPlay. No implementa todas las funciones de AirPlay 2 ni audio multiroom.
-- La duplicación de pantalla incluye video H.264 y audio AAC; el modo de audio dedicado admite ALAC.
-- El video protegido por DRM, como contenido de Apple TV, no se puede descifrar.
-- El streaming directo HLS desde apps depende de compatibilidad específica (por ejemplo, YouTube); para video general usa **Duplicar pantalla**.
-- El descubrimiento requiere la misma red local y mDNS/Avahi; la función no establece una conexión punto a punto fuera de esa red.
+- Uses the legacy AirPlay mirroring protocol supported by UxPlay. It does not implement every AirPlay 2 feature or multi-room audio.
+- Screen mirroring carries H.264 video and AAC audio; dedicated audio mode supports ALAC.
+- DRM-protected video, such as content from the Apple TV app, cannot be decrypted.
+- Direct HLS streaming depends on app-specific support (for example, YouTube). Use **Screen Mirroring** for general video.
+- Discovery requires the same local network and mDNS/Avahi; this app does not create a peer-to-peer connection outside that network.
 
-La interfaz escucha únicamente en `127.0.0.1`. El stream y el audio se procesan en el propio host mediante UxPlay/GStreamer; no pasan por el navegador.
+The control interface listens only on `127.0.0.1`. UxPlay/GStreamer process the stream and audio on the host; media does not pass through the browser.
 
-## Rendimiento
+## Performance
 
-Al iniciar, PenguinPlay solicita hasta 60 FPS y deja que GStreamer seleccione automáticamente el decoder y la salida de vídeo compatibles con la sesión gráfica. La sincronización normal de audio y vídeo queda activa. El límite de 60 FPS es una petición al iPhone, no una garantía: el resultado también depende del contenido y del dispositivo emisor.
+At startup, PenguinPlay requests up to 60 FPS and lets GStreamer automatically choose a decoder and video output compatible with the current graphics session. Normal audio/video synchronization remains enabled. The 60 FPS value is a request to the iPhone, not a guarantee; actual performance also depends on the content and sending device.

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Receptor AirPlay de imagen y sonido para Linux",
+  "description": "AirPlay screen and audio receiver for Linux",
   "author": "JonayMr",
   "desktopName": "penguinplay",
   "main": "electron/main.js",
@@ -31,8 +31,8 @@
       "category": "AudioVideo",
       "icon": "assets/penguinplay.png",
       "syncDesktopName": true,
-      "synopsis": "Receptor AirPlay de imagen y sonido",
-      "description": "Duplica la pantalla y recibe audio desde dispositivos iOS en Linux.",
+      "synopsis": "AirPlay screen and audio receiver",
+      "description": "Mirror your screen and receive audio from iOS devices on Linux.",
       "artifactName": "PenguinPlay-${version}.${ext}"
     }
   },

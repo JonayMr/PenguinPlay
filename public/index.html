@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f2f1e9">
+    <meta name="theme-color" content="#111815">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'">
-    <title>PenguinPlay | Receptor AirPlay</title>
+    <title>PenguinPlay | AirPlay Receiver</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,27 +14,27 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="wordmark" href="/" aria-label="PenguinPlay, inicio">
-        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+      <a class="wordmark" href="/" aria-label="PenguinPlay home">
+        <span class="brand-mark" aria-hidden="true">🐧</span>
         <span>penguin<span class="wordmark-light">play</span></span>
       </a>
-      <div class="topbar-meta"><span class="live-dot"></span><span>RECEPTOR LOCAL</span><span class="meta-divider"></span><span id="clock">--:--</span></div>
+      <div class="topbar-meta"><span class="live-dot"></span><span>LOCAL RECEIVER</span><span class="meta-divider"></span><span id="clock">--:--</span></div>
     </header>
 
     <main class="workspace">
       <section class="intro" aria-labelledby="page-title">
-        <div class="eyebrow"><span class="eyebrow-line"></span> AIRPLAY PARA LINUX <span class="eyebrow-index">01 / 01</span></div>
-        <h1 id="page-title">Tu pantalla,<br><span>en grande.</span></h1>
-        <p class="intro-copy">Recibe imagen y sonido de tu iPhone o iPad en esta pantalla.</p>
+        <div class="eyebrow"><span class="eyebrow-line"></span> AIRPLAY FOR LINUX <span class="eyebrow-index">01 / 01</span></div>
+        <h1 id="page-title">Your screen,<br><span>up close.</span></h1>
+        <p class="intro-copy">Stream your iPhone or iPad screen and audio to this display.</p>
       </section>
 
       <section class="receiver-panel" aria-labelledby="receiver-heading">
         <div class="panel-topline">
           <div>
-            <p class="section-kicker">ESTACIÓN DE RECEPCIÓN</p>
+            <p class="section-kicker">RECEIVER STATION</p>
             <h2 id="receiver-heading">PenguinPlay</h2>
           </div>
-          <div id="status-badge" class="status-badge" data-state="stopped"><span class="status-indicator"></span><span id="status-label">DETENIDO</span></div>
+          <div id="status-badge" class="status-badge" data-state="stopped"><span class="status-indicator"></span><span id="status-label">STOPPED</span></div>
         </div>
 
         <div class="signal-visual" aria-hidden="true">
@@ -44,41 +44,41 @@
           <div class="signal-wave wave-one"></div>
           <div class="signal-wave wave-two"></div>
           <div class="signal-wave wave-three"></div>
-          <span class="visual-label visual-label-left">VÍDEO</span>
+          <span class="visual-label visual-label-left">VIDEO</span>
           <span class="visual-label visual-label-right">AUDIO</span>
-          <span class="visual-caption">LISTO PARA RECIBIR</span>
+          <span class="visual-caption">READY TO RECEIVE</span>
         </div>
 
         <form id="receiver-form" class="settings" autocomplete="off">
-          <label class="field-label" for="receiver-name">NOMBRE EN AIRPLAY</label>
+          <label class="field-label" for="receiver-name">AIRPLAY NAME</label>
           <div class="name-control">
             <input id="receiver-name" name="name" type="text" maxlength="40" value="PenguinPlay" required pattern="[\p{L}\p{N} _.\x2D]+" aria-describedby="name-help">
             <span class="field-count"><span id="name-count">11</span><span> / 40</span></span>
           </div>
-          <p id="name-help" class="field-hint">Así aparecerá en “Duplicar pantalla” en tu dispositivo.</p>
+          <p id="name-help" class="field-hint">This is the name shown in Screen Mirroring on your device.</p>
 
           <div class="actions">
-            <button id="start-button" class="start-button" type="submit"><span class="button-icon" aria-hidden="true">▶</span><span>Iniciar receptor</span></button>
-            <button id="stop-button" class="stop-button" type="button" disabled aria-label="Detener receptor" title="Detener receptor"><span aria-hidden="true">■</span></button>
+            <button id="start-button" class="start-button" type="submit"><span class="button-icon" aria-hidden="true">▶</span><span>Start receiver</span></button>
+            <button id="stop-button" class="stop-button" type="button" disabled aria-label="Stop receiver" title="Stop receiver"><span aria-hidden="true">■</span></button>
           </div>
           <p id="notice" class="notice" role="status" aria-live="polite"></p>
         </form>
       </section>
 
-      <section class="connection-row" aria-label="Estado de conexión">
-        <div class="connection-step"><span class="step-number">01</span><span class="step-label">RECEPTOR</span><span id="receiver-state" class="step-value">Apagado</span></div>
+      <section class="connection-row" aria-label="Connection status">
+        <div class="connection-step"><span class="step-number">01</span><span class="step-label">RECEIVER</span><span id="receiver-state" class="step-value">Off</span></div>
         <span class="step-connector" aria-hidden="true"></span>
-        <div class="connection-step"><span class="step-number">02</span><span class="step-label">RED LOCAL</span><span class="step-value"><span class="network-dot"></span> Misma Wi-Fi</span></div>
+        <div class="connection-step"><span class="step-number">02</span><span class="step-label">LOCAL NETWORK</span><span class="step-value"><span class="network-dot"></span> Same Wi-Fi</span></div>
         <span class="step-connector" aria-hidden="true"></span>
-        <div class="connection-step"><span class="step-number">03</span><span class="step-label">DISPOSITIVO</span><span class="step-value">iPhone · iPad</span></div>
+        <div class="connection-step"><span class="step-number">03</span><span class="step-label">DEVICE</span><span class="step-value">iPhone · iPad</span></div>
       </section>
 
       <details class="activity">
-        <summary><span class="activity-title"><span class="activity-led"></span> ACTIVIDAD DEL RECEPTOR</span><span id="log-count" class="log-count">0 EVENTOS</span></summary>
-        <div id="log-list" class="log-list"><p class="empty-log">Los mensajes de UxPlay aparecerán aquí.</p></div>
+        <summary><span class="activity-title"><span class="activity-led"></span> RECEIVER ACTIVITY</span><span id="log-count" class="log-count">0 EVENTS</span></summary>
+        <div id="log-list" class="log-list"><p class="empty-log">UxPlay messages will appear here.</p></div>
       </details>
     </main>
 
-    <footer class="footer"><span>PenguinPlay <span class="footer-separator">/</span> UxPlay</span><span>FUNCIONA EN ESTA RED LOCAL</span></footer>
+    <footer class="footer"><span>PenguinPlay <span class="footer-separator">/</span> UxPlay</span><span>RUNS ON YOUR LOCAL NETWORK</span></footer>
   </body>
 </html>

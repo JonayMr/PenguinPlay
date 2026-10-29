@@ -63,7 +63,7 @@ async function readJson(request) {
   let body = '';
   for await (const chunk of request) {
     body += chunk;
-    if (body.length > 4096) throw new Error('La solicitud es demasiado grande.');
+    if (body.length > 4096) throw new Error('Request body is too large.');
   }
   return JSON.parse(body || '{}');
 }
@@ -72,7 +72,7 @@ async function serveStatic(pathname, response) {
   const relativePath = pathname === '/' ? 'index.html' : decodeURIComponent(pathname.slice(1));
   const filePath = resolve(publicRoot, relativePath);
   if (!filePath.startsWith(`${publicRoot}${sep}`)) {
-    sendJson(response, 404, { error: 'No encontrado.' });
+    sendJson(response, 404, { error: 'Not found.' });
     return;
   }
 
@@ -91,7 +91,7 @@ async function serveStatic(pathname, response) {
     });
     response.end(content);
   } catch {
-    sendJson(response, 404, { error: 'No encontrado.' });
+    sendJson(response, 404, { error: 'Not found.' });
   }
 }
 
@@ -105,7 +105,7 @@ const server = createServer(async (request, response) => {
 
   if (request.method === 'POST' && ['/api/start', '/api/stop'].includes(url.pathname)) {
     if (request.headers.origin && request.headers.origin !== `http://127.0.0.1:${port}` && request.headers.origin !== `http://localhost:${port}`) {
-      sendJson(response, 403, { error: 'Origen no permitido.' });
+      sendJson(response, 403, { error: 'Origin not allowed.' });
       return;
     }
 
@@ -116,7 +116,7 @@ const server = createServer(async (request, response) => {
     }
 
     if (receiver && receiver.exitCode === null && receiver.signalCode === null) {
-      sendJson(response, 409, { error: 'El receptor ya está activo.' });
+      sendJson(response, 409, { error: 'The receiver is already running.' });
       return;
     }
 
@@ -124,37 +124,37 @@ const server = createServer(async (request, response) => {
       const body = await readJson(request);
       const name = typeof body.name === 'string' ? body.name.trim() : '';
       if (!/^[\p{L}\p{N} _.-]{1,40}$/u.test(name)) {
-        sendJson(response, 400, { error: 'Usa un nombre de 1 a 40 letras, números, espacios, puntos, guiones o guiones bajos.' });
+        sendJson(response, 400, { error: 'Use a name with 1–40 letters, numbers, spaces, periods, hyphens, or underscores.' });
         return;
       }
 
       const binary = await findUxPlay();
       if (!binary) {
-        sendJson(response, 503, { error: 'No encuentro uxplay. Ejecuta ./scripts/install-uxplay.sh o revisa el README.' });
+        sendJson(response, 503, { error: 'UxPlay was not found. Run ./scripts/install-uxplay.sh or see the README.' });
         return;
       }
 
       logs.length = 0;
       lastExit = null;
       const args = ['-n', name, '-nh', '-p', '35000', '-fps', '60'];
-      addLog('Arrancando UxPlay con selección automática de decoder y salida de vídeo.');
-      addLog('Solicito hasta 60 FPS; sincronización de audio/vídeo activa.');
+      addLog('Starting UxPlay with automatic decoder and video output selection.');
+      addLog('Requesting up to 60 FPS; audio/video synchronization is enabled.');
       const child = spawn('stdbuf', ['-oL', '-eL', binary, ...args], { stdio: ['ignore', 'pipe', 'pipe'] });
       receiver = Object.assign(child, { binary });
-      addLog(`Proceso iniciado: ${name} (${binary}).`);
+      addLog(`Process started: ${name} (${binary}).`);
       child.stdout.setEncoding('utf8').on('data', (text) => text.split(/\r?\n/).forEach(addLog));
       child.stderr.setEncoding('utf8').on('data', (text) => text.split(/\r?\n/).forEach(addLog));
       child.on('error', (error) => {
-        addLog(`Error al iniciar: ${error.message}`);
+        addLog(`Could not start UxPlay: ${error.message}`);
         lastExit = { code: null, signal: null };
       });
       child.on('exit', (code, signal) => {
         lastExit = { code, signal };
-        addLog(`UxPlay finalizó (${signal ?? `código ${code}`}).`);
+        addLog(`UxPlay exited (${signal ?? `code ${code}`}).`);
       });
       sendJson(response, 202, currentStatus());
     } catch (error) {
-      sendJson(response, 400, { error: error instanceof SyntaxError ? 'JSON no válido.' : error.message });
+      sendJson(response, 400, { error: error instanceof SyntaxError ? 'Invalid JSON.' : error.message });
     }
     return;
   }
@@ -164,11 +164,11 @@ const server = createServer(async (request, response) => {
     return;
   }
 
-  sendJson(response, 405, { error: 'Método no permitido.' });
+  sendJson(response, 405, { error: 'Method not allowed.' });
 });
 
 server.listen(port, '127.0.0.1', () => {
-  console.log(`PenguinPlay listo en http://127.0.0.1:${port}`);
+  console.log(`PenguinPlay is ready at http://127.0.0.1:${port}`);
 });
 
 export function stopReceiver() {

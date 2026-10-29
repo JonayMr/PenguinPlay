@@ -14,7 +14,7 @@ function createWindow() {
     minHeight: 640,
     show: false,
     title: 'PenguinPlay',
-    backgroundColor: '#f2f1e9',
+    backgroundColor: '#111815',
     autoHideMenuBar: true,
     webPreferences: {
       contextIsolation: true,
@@ -57,7 +57,7 @@ app.on('before-quit', (event) => {
   event.preventDefault();
   isClosing = true;
   closeServer().catch((error) => {
-    dialog.showErrorBox('PenguinPlay', `No se pudo cerrar el receptor correctamente: ${error.message}`);
+    dialog.showErrorBox('PenguinPlay', `The receiver could not be shut down cleanly: ${error.message}`);
   }).finally(() => app.quit());
 });
 

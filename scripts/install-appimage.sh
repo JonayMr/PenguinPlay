@@ -11,8 +11,8 @@ desktop_dir="$HOME/.local/share/applications"
 desktop_path="$desktop_dir/penguinplay.desktop"
 
 if [[ ! -x "$appimage_source" ]]; then
-  printf 'No encuentro el AppImage empaquetado: %s\n' "$appimage_source" >&2
-  printf 'Primero ejecuta npm ci y npm run dist.\n' >&2
+  printf 'Packaged AppImage not found: %s\n' "$appimage_source" >&2
+  printf 'Run npm ci and npm run dist first.\n' >&2
   exit 1
 fi
 
@@ -30,5 +30,5 @@ if command -v update-desktop-database >/dev/null 2>&1; then
   update-desktop-database "$desktop_dir" || true
 fi
 
-printf 'PenguinPlay instalado. Ábrelo desde Caelestia con Meta+Espacio.\n'
-printf 'Lanzador: %s\n' "$desktop_path"
+printf 'PenguinPlay installed. Launch it from Caelestia with Meta+Space.\n'
+printf 'Launcher: %s\n' "$desktop_path"

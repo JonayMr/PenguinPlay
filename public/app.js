@@ -14,8 +14,8 @@ let lastLogCount = 0;
 
 function setStatus(running) {
   statusBadge.dataset.state = running ? 'running' : 'stopped';
-  statusLabel.textContent = running ? 'EN ESPERA' : 'DETENIDO';
-  receiverState.textContent = running ? 'Activo y visible' : 'Apagado';
+  statusLabel.textContent = running ? 'READY' : 'STOPPED';
+  receiverState.textContent = running ? 'Active and visible' : 'Off';
   startButton.disabled = running;
   stopButton.disabled = !running;
   document.querySelector('.signal-visual').classList.toggle('is-running', running);
@@ -24,9 +24,9 @@ function setStatus(running) {
 function renderLogs(logs) {
   if (logs.length === lastLogCount) return;
   lastLogCount = logs.length;
-  logCount.textContent = `${logs.length} ${logs.length === 1 ? 'EVENTO' : 'EVENTOS'}`;
+  logCount.textContent = `${logs.length} ${logs.length === 1 ? 'EVENT' : 'EVENTS'}`;
   if (!logs.length) {
-    logList.innerHTML = '<p class="empty-log">Los mensajes de UxPlay aparecerán aquí.</p>';
+    logList.innerHTML = '<p class="empty-log">UxPlay messages will appear here.</p>';
     return;
   }
 
@@ -36,7 +36,7 @@ function renderLogs(logs) {
     const timestamp = document.createElement('time');
     const message = document.createElement('span');
     timestamp.dateTime = time;
-    timestamp.textContent = new Date(time).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    timestamp.textContent = new Date(time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     message.textContent = text;
     row.append(timestamp, message);
     fragment.append(row);
@@ -52,7 +52,7 @@ async function refreshStatus() {
     setStatus(status.running);
     renderLogs(status.logs);
   } catch {
-    notice.textContent = 'No se pudo contactar con el controlador local.';
+    notice.textContent = 'Could not reach the local controller.';
   }
 }
 
@@ -72,7 +72,7 @@ form.addEventListener('submit', async (event) => {
     });
     const result = await response.json();
     if (!response.ok) throw new Error(result.error);
-    notice.textContent = 'UxPlay inicializado y esperando una conexión AirPlay.';
+    notice.textContent = 'UxPlay is ready and waiting for an AirPlay connection.';
     await refreshStatus();
   } catch (error) {
     notice.textContent = error.message;
@@ -84,15 +84,15 @@ stopButton.addEventListener('click', async () => {
   stopButton.disabled = true;
   try {
     await fetch('/api/stop', { method: 'POST' });
-    notice.textContent = 'Receptor detenido.';
+    notice.textContent = 'Receiver stopped.';
     await refreshStatus();
   } catch {
-    notice.textContent = 'No se pudo detener el receptor.';
+    notice.textContent = 'Could not stop the receiver.';
   }
 });
 
 function updateClock() {
-  document.querySelector('#clock').textContent = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+  document.querySelector('#clock').textContent = new Intl.DateTimeFormat('en-US', { hour: '2-digit', minute: '2-digit' }).format(new Date());
 }
 
 updateClock();

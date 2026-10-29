@@ -2,7 +2,7 @@
 Version=1.0
 Type=Application
 Name=PenguinPlay
-Comment=Receptor AirPlay para imagen y sonido
+Comment=AirPlay screen and audio receiver
 Exec=@APPIMAGE_PATH@
 Icon=@ICON_PATH@
 Terminal=false
