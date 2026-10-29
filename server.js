@@ -25,7 +25,11 @@ async function findUxPlay() {
   const executableName = isWindows ? 'uxplay.exe' : 'uxplay';
   const candidates = [
     process.env.UXPLAY_BIN,
-    ...(isWindows ? [join(homedir(), 'AppData', 'Local', 'Programs', 'UxPlay', executableName)] : []),
+    ...(isWindows ? [
+      join(process.env.MSYS2_ROOT ?? 'C:\\msys64', 'ucrt64', 'bin', executableName),
+      join(process.env.MSYS2_ROOT ?? 'C:\\msys64', 'mingw64', 'bin', executableName),
+      join(homedir(), 'AppData', 'Local', 'Programs', 'UxPlay', executableName),
+    ] : []),
     join(homedir(), '.local', 'bin', 'uxplay'),
     '/usr/local/bin/uxplay',
     '/usr/bin/uxplay',
@@ -147,7 +151,19 @@ const server = createServer(async (request, response) => {
       addLog('Requesting up to 60 FPS; audio/video synchronization is enabled.');
       const command = process.platform === 'win32' ? binary : 'stdbuf';
       const commandArgs = process.platform === 'win32' ? args : ['-oL', '-eL', binary, ...args];
-      const child = spawn(command, commandArgs, { stdio: ['ignore', 'pipe', 'pipe'] });
+      const childEnv = { ...process.env };
+      if (process.platform === 'win32') {
+        const mingwPrefix = resolve(binary, '..', '..');
+        const mingwBin = resolve(binary, '..');
+        const gstPluginDir = join(mingwPrefix, 'lib', 'gstreamer-1.0');
+        const gstScanner = join(mingwPrefix, 'libexec', 'gstreamer-1.0', 'gst-plugin-scanner.exe');
+        childEnv.PATH = [mingwBin, childEnv.PATH].filter(Boolean).join(';');
+        childEnv.GST_PLUGIN_PATH = childEnv.GST_PLUGIN_PATH
+          ? `${gstPluginDir};${childEnv.GST_PLUGIN_PATH}`
+          : gstPluginDir;
+        childEnv.GST_PLUGIN_SCANNER = childEnv.GST_PLUGIN_SCANNER ?? gstScanner;
+      }
+      const child = spawn(command, commandArgs, { stdio: ['ignore', 'pipe', 'pipe'], env: childEnv });
       receiver = Object.assign(child, { binary });
       addLog(`Process started: ${name} (${binary}).`);
       child.stdout.setEncoding('utf8').on('data', (text) => text.split(/\r?\n/).forEach(addLog));

@@ -10,7 +10,9 @@
   "scripts": {
     "start": "node server.js",
     "desktop": "electron .",
-    "dist": "electron-builder --linux AppImage"
+    "dist": "electron-builder",
+    "dist:linux": "electron-builder --linux AppImage",
+    "dist:win": "electron-builder --win nsis"
   },
   "build": {
     "appId": "dev.penguinplay.desktop",
@@ -34,6 +36,19 @@
       "synopsis": "AirPlay screen and audio receiver",
       "description": "Mirror your screen and receive audio from iOS devices on Linux.",
       "artifactName": "PenguinPlay-${version}.${ext}"
+    },
+    "win": {
+      "target": ["nsis"],
+      "icon": "assets/penguinplay.ico",
+      "artifactName": "PenguinPlay-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "PenguinPlay"
     }
   },
   "devDependencies": {

@@ -4,6 +4,13 @@ An AirPlay receiver app for Linux and Windows. The desktop app manages [UxPlay](
 
 ![PenguinPlay desktop app in dark mode](docs/screenshots/penguinplay-dark.png)
 
+## Downloads
+
+Get the latest [Linux AppImage and Windows installer from GitHub Releases](https://github.com/JonayMr/PenguinPlay/releases/latest). These packages install the PenguinPlay desktop app. UxPlay and its GStreamer runtime are separate prerequisites, described below for each platform.
+
+- **Linux:** `PenguinPlay-<version>.AppImage`
+- **Windows:** `PenguinPlay-Setup-<version>.exe`
+
 ## Run in development
 
 ```sh
@@ -14,50 +21,42 @@ Open <http://127.0.0.1:4173>. Development uses Electron and electron-builder; th
 
 ## Desktop application
 
-Build and install the AppImage:
+Build the package for the current OS:
 
 ```sh
 npm ci
-npm run dist
-./scripts/install-appimage.sh
+npm run dist:linux   # Linux AppImage
+npm run dist:win     # Windows NSIS installer (run on Windows)
 ```
 
-The installer places the AppImage in `~/.local/opt/penguinplay`, registers a desktop entry in `~/.local/share/applications`, and installs the icon. Caelestia indexes that entry in its Meta+Space launcher. The desktop window starts the local server automatically and stops UxPlay when it closes.
+On Linux, `./scripts/install-appimage.sh` places the AppImage in `~/.local/opt/penguinplay`, registers a desktop entry in `~/.local/share/applications`, and installs the icon. Caelestia indexes that entry in its Meta+Space launcher. The desktop window starts the local server automatically and stops UxPlay when it closes.
 
 ## Run on Windows 10/11
 
-PenguinPlay's Electron desktop UI runs on Windows. The Windows host also needs a Windows build of UxPlay and GStreamer; the Linux AppImage is not used on Windows.
+For normal use, download and run `PenguinPlay-Setup-<version>.exe` from the [latest release](https://github.com/JonayMr/PenguinPlay/releases/latest). The installer creates Start Menu and desktop shortcuts; Node.js and the project source are not needed. The receiver engine is UxPlay, so install its Windows build and GStreamer once as described below. The installer will find UxPlay in the default MSYS2 UCRT64 path (`C:\msys64\ucrt64\bin\uxplay.exe`).
 
-### Build UxPlay
+### Install UxPlay and GStreamer (one-time prerequisite)
 
-1. Install [MSYS2](https://www.msys2.org/), then open the **MSYS2 UCRT64** terminal from the Start menu.
-2. Update MSYS2 when prompted, reopen UCRT64, then install the compiler and media dependencies:
+Install [MSYS2](https://www.msys2.org/), then open the **MSYS2 UCRT64** terminal from the Start menu. Update the environment:
 
 ```sh
 pacman -Syu
 ```
 
-If the terminal closes after the core update, reopen **MSYS2 UCRT64** and run:
+If the terminal closes after the core update, reopen **MSYS2 UCRT64**. Then download and run PenguinPlay's setup script:
 
 ```sh
-pacman -S --needed git mingw-w64-ucrt-x86_64-cmake mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-ninja mingw-w64-ucrt-x86_64-pkgconf mingw-w64-ucrt-x86_64-libplist mingw-w64-ucrt-x86_64-gstreamer mingw-w64-ucrt-x86_64-gst-plugins-base mingw-w64-ucrt-x86_64-gst-plugins-good mingw-w64-ucrt-x86_64-gst-plugins-bad mingw-w64-ucrt-x86_64-gst-libav
+curl -fsSLo install-uxplay-windows.sh https://raw.githubusercontent.com/JonayMr/PenguinPlay/main/scripts/install-uxplay-windows.sh
+bash install-uxplay-windows.sh
 ```
 
-3. Build the current UxPlay source with its built-in mDNS responder, so a separate Bonjour SDK/service is not required:
-
-```sh
-git clone https://github.com/FDH2/UxPlay.git
-cd UxPlay
-cmake -S . -B build -G Ninja -DCMAKE_INSTALL_PREFIX="$MINGW_PREFIX" -DUSE_MDNS=1
-cmake --build build
-cmake --install build
-```
-
-The executable should be at `C:\msys64\ucrt64\bin\uxplay.exe`. UxPlay's built-in mDNS option is available in v1.74 and later; if building an older version, follow UxPlay's Bonjour SDK instructions instead.
+The script installs the compiler, GStreamer and required plugins, then builds current UxPlay with its built-in mDNS responder. No Bonjour SDK or separate mDNS service is required. The executable is installed at `C:\msys64\ucrt64\bin\uxplay.exe`, which the PenguinPlay app detects automatically.
 
 ### Install and run PenguinPlay
 
-Install [Node.js LTS](https://nodejs.org/) for Windows. In the **MSYS2 UCRT64** terminal, clone this repository and install its npm dependencies:
+Download and run `PenguinPlay-Setup-<version>.exe`, then launch PenguinPlay from the Start Menu or desktop shortcut. No Node.js or MSYS2 terminal is needed for routine launches once UxPlay and GStreamer are installed.
+
+To build the installer from source instead, install [Node.js LTS](https://nodejs.org/) for Windows and run these commands from the repository:
 
 ```sh
 git clone https://github.com/JonayMr/PenguinPlay.git
@@ -65,13 +64,13 @@ cd PenguinPlay
 npm ci
 ```
 
-Start the desktop app from the same UCRT64 terminal so Electron inherits the GStreamer runtime environment and finds `uxplay.exe` on `PATH`:
+Build the Windows installer on Windows:
 
 ```sh
-npm run desktop
+npm run dist:win
 ```
 
-The desktop UI launches UxPlay when you press **Start receiver**. You can also run the web UI in development with `npm start` and open <http://127.0.0.1:4173>. The `npm run dist` AppImage target is Linux-only; a signed Windows installer is not currently provided.
+The desktop UI launches UxPlay when you press **Start receiver**. You can also run the web UI in development with `npm start` and open <http://127.0.0.1:4173>. Release builds are produced automatically for both platforms when a `v*` version tag is pushed. The Windows installer is not currently code-signed, so Windows SmartScreen may show its first-run warning.
 
 ### Windows Firewall and network
 
